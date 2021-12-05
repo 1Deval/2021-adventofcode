@@ -16,18 +16,23 @@ public class Main {
 
         final List<Board> boards = getBoards(rawBoards);
 
+        Integer p1 = null, p2 = null;
         for (final int call : calls) {
             final Iterator<Board> boardIterator = boards.iterator();
             while (boardIterator.hasNext()) {
                 final Board board = boardIterator.next();
                 final Integer computed = board.call(call);
                 if (computed != null) {
-                    System.out.println(computed);
+                    if (p1 == null) {
+                        p1 = computed;
+                    }
+                    p2 = computed;
                     boardIterator.remove();
                 }
             }
         }
-//        System.out.println(boards);
+        System.out.printf("p1 %d%n", p1);
+        System.out.printf("p2 %d%n", p2);
     }
 
     private static List<Board> getBoards(final List<String> rawBoards) {
