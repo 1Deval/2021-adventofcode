@@ -50,8 +50,6 @@ public class Main {
                 return '0';
             }
         });
-        System.out.println(oxygenRating);
-        System.out.println(co2Rating);
         System.out.println(Integer.parseInt(oxygenRating, 2) * Integer.parseInt(co2Rating, 2));
 
 
@@ -76,7 +74,7 @@ public class Main {
         final List<String> filteredData = data.stream().filter(s -> s.charAt(position) == filterChar).collect(Collectors.toList());
 
         if (filteredData.size() == 1) {
-            return data.get(0);
+            return filteredData.get(0);
         }
         return findFilteredRating(filteredData, position + 1, filterFunction);
     }
