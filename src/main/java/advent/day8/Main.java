@@ -74,12 +74,6 @@ public class Main {
 
             final int val = Integer.parseInt(entry.right.stream()
                     .map(digit -> digit.codes).map(mapping::get)
-                            .map(s -> {
-                                if (s == null) {
-                                    throw new IllegalStateException();
-                                }
-                                return s;
-                            })
                     .collect(Collectors.joining()));
             System.out.println(val);
             sum += val;
