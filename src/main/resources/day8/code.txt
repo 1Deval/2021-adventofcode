@@ -1,0 +1,35 @@
+1 -   c  f   - * -
+4 -  bcd f   - * -
+7 - a c  f   - * -
+8 - abcdefg  - * -
+
+0 - abc efg  - 6  - ab ecfg
+2 - a cde g  - 5  - a d ceg
+3 - a cd fg  - 5  - a d cfg
+5 - ab d fg  - 5  - abd  fg
+6 - ab defg  - 6  - abde fg
+
+9 - abcd fg  - 6  - abd cfg
+
+
+
+a = common 7,8 not 1,4
+e = 8 - 7,4
+
+X = bd
+Y = cf
+Z = fg
+
+
+d = size 5 - g - a - cf(1) -- one char
+
+3 - a cd fg  -   -  cd f=3
+
+0 - abc efg  -   - bcef=4
+
+size 6 is 0
+
+2 - a cd eg  -   -  c e=2
+5 - ab d fg  -   - b  f=2
+6 - ab defg  -   - b ef=3
+9 - abcd fg  -   - bc f=3
