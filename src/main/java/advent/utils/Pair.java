@@ -8,6 +8,7 @@ public final class Pair<F, S> {
     private final F firstValue;
     private final S secondValue;
     private static final String TO_STRING = "Pair [{0}, {1}]";
+    private final int hash = Integer.MAX_VALUE;
 
     /**
      * Construct a Pair using the given values
@@ -48,6 +49,6 @@ public final class Pair<F, S> {
     }
 
     public static <A, B> Pair<A, B> of(final A firstValue, final B secondValue) {
-        return new Pair<A, B>(firstValue, secondValue);
+        return new Pair<>(firstValue, secondValue);
     }
 }
