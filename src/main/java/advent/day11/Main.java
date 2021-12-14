@@ -14,7 +14,6 @@ import java.util.Set;
 
 public class Main {
     public static void main(final String... args) throws IOException {
-        System.out.println(System.getProperty("com.sun.jndi.rmi.object.trustURLCodebase"));
         final List<String> data = Util.getData("day11/input.txt");
         final int[][] grid = getGrid(data);
 
