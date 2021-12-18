@@ -19,38 +19,43 @@ import java.util.stream.Collectors;
 public class Main {
     public static void main(final String... args) throws IOException {
         final List<String> data = Util.getData("day15/input.txt");
-        final int[][] grid = getGrid(data);
+        final int[][] baseGrid = getGrid(data);
 
-        final int xMax = grid.length - 1;
-        final int yMax = grid[0].length - 1;
+        final int gridMultiplier = 5;
+        final int xMax = baseGrid.length * gridMultiplier;
+        final int yMax = baseGrid[0].length * gridMultiplier;
+        final int xMaxIndex = xMax - 1;
+        final int yMaxIndex = yMax - 1;
 
-        final EdgeReference edgeReference = new EdgeReference(xMax, yMax);
+        final EdgeReference edgeReference = new EdgeReference(xMaxIndex, yMaxIndex);
 
-        printGrid(grid);
-        final Set<Pair<Integer, Integer>> points = convertToPoints(grid);
+//        printGrid(baseGrid);
+
+        final InfiniteGrid infiniteGrid = new InfiniteGrid(baseGrid);
+
+        final Set<Pair<Integer, Integer>> points = convertToPoints(baseGrid);
         final Map<Pair<Integer, Integer>, CostMeta> pairCost = new HashMap<>();
         final Pair<Integer, Integer> start = Pair.of(0, 0);
         pairCost.put(start, new CostMeta(null, 0));
         final HashSet<Pair<Integer, Integer>> visited = new HashSet<>();
-//        final List<Pair<Integer, Integer>> toVisit = new ArrayList<>();
         final PriorityQueue<Pair<Integer, Integer>> toVisit = new PriorityQueue<>(Comparator.comparing(integerIntegerPair -> pairCost.get(integerIntegerPair).visitCost));
         toVisit.add(start);
         while (!toVisit.isEmpty()) {
-            final Set<Pair<Integer, Integer>> surround = fill(toVisit.poll(), visited, edgeReference, pairCost, grid);
+            final Set<Pair<Integer, Integer>> surround = fill(toVisit.poll(), visited, edgeReference, pairCost, infiniteGrid);
             surround.removeAll(visited);
             toVisit.forEach(surround::remove);
             toVisit.addAll(surround);
         }
 
-        System.out.println(pairCost.get(Pair.of(xMax, yMax)));
-        printPath(grid, xMax, yMax, pairCost);
+        System.out.println(pairCost.get(Pair.of(xMaxIndex, yMaxIndex)));
+        printPath(infiniteGrid, xMax, yMax, pairCost);
     }
 
     private static Set<Pair<Integer, Integer>> fill(final Pair<Integer, Integer> point,
                                                     final Set<Pair<Integer, Integer>> visited,
                                                     final EdgeReference edgeReference,
                                                     final Map<Pair<Integer, Integer>, CostMeta> pairCost,
-                                                    final int[][] grid) {
+                                                    final InfiniteGrid fancyGrid) {
         if (visited.contains(point)) {
             return Collections.emptySet();
         }
@@ -62,7 +67,7 @@ public class Main {
         for (final Direction surroundingDirection : surroundingDirections) {
             final Pair<Integer, Integer> surroundPoint = Pair.of(x + surroundingDirection.getX(), y + surroundingDirection.getY());
             pairCost.compute(surroundPoint, (integerIntegerPair, costMeta) -> {
-                final int possibleCost = grid[surroundPoint.getFirstValue()][surroundPoint.getSecondValue()] + currentPointCost.visitCost;
+                final int possibleCost = fancyGrid.getValue(surroundPoint.getFirstValue(), surroundPoint.getSecondValue()) + currentPointCost.visitCost;
                 if (costMeta == null || possibleCost < costMeta.visitCost) {
                     return new CostMeta(point, possibleCost);
                 } else {
@@ -73,17 +78,17 @@ public class Main {
         return surroundingDirections.stream().map(direction -> Pair.of(x + direction.getX(), y + direction.getY())).collect(Collectors.toSet());
     }
 
-    private static void printPath(final int[][] grid, final int xMax, final int yMax, final Map<Pair<Integer, Integer>, CostMeta> pairCost) {
+    private static void printPath(final InfiniteGrid grid, final int xMax, final int yMax, final Map<Pair<Integer, Integer>, CostMeta> pairCost) {
         final Map<Pair<Integer, Integer>, Integer> pathCost = new HashMap<>();
-        Pair<Integer, Integer> tpt = Pair.of(xMax, yMax);
+        Pair<Integer, Integer> tpt = Pair.of(xMax - 1, yMax - 1);
         do {
             final CostMeta tcm = pairCost.get(tpt);
             pathCost.put(tpt, tcm.visitCost);
             tpt = tcm.visitFrom;
         } while (tpt != null);
-        for (int y = 0; y < grid[0].length; y++) {
-            for (int x = 0; x < grid.length; x++) {
-                final int val = grid[x][y];
+        for (int y = 0; y < yMax; y++) {
+            for (int x = 0; x < xMax; x++) {
+                final int val = grid.getValue(x, y);
                 System.out.printf("%s ", pathCost.containsKey(Pair.of(x, y)) ? Color.ANSI_RED.wrap(val) : Integer.toString(val));
             }
             System.out.println();
