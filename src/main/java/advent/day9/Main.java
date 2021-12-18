@@ -96,21 +96,13 @@ public class Main {
         final Set<Direction> directionsToCheck = EnumSet.allOf(Direction.class);
         if (mapper.isTopEdge()) {
             directionsToCheck.remove(Direction.TOP);
-//            directionsToCheck.remove(Direction.TOP_LEFT);
-//            directionsToCheck.remove(Direction.TOP_RIGHT);
         } else if (mapper.isBottomEdge()) {
             directionsToCheck.remove(Direction.BOTTOM);
-//            directionsToCheck.remove(Direction.BOTTOM_LEFT);
-//            directionsToCheck.remove(Direction.BOTTOM_RIGHT);
         }
         if (mapper.isRightEdge()) {
             directionsToCheck.remove(Direction.RIGHT);
-//            directionsToCheck.remove(Direction.TOP_RIGHT);
-//            directionsToCheck.remove(Direction.BOTTOM_RIGHT);
         } else if (mapper.isLeftEdge()) {
             directionsToCheck.remove(Direction.LEFT);
-//            directionsToCheck.remove(Direction.TOP_LEFT);
-//            directionsToCheck.remove(Direction.BOTTOM_LEFT);
         }
         return directionsToCheck;
     }

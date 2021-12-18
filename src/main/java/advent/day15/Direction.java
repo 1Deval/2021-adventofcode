@@ -1,4 +1,4 @@
-package advent.day9;
+package advent.day15;
 
 public enum Direction {
     TOP(0, -1),
@@ -22,7 +22,11 @@ public enum Direction {
         return y;
     }
 
-    int getValue(final int[][] grid, final int ix, final int iy){
-        return grid[ix+x][iy+y];
+    int getValue(final int[][] grid, final int ix, final int iy) {
+        return grid[ix + x][iy + y];
+    }
+
+    void setValue(final int[][] grid, final int ix, final int iy, final int value) {
+        grid[ix + x][iy + y] = value;
     }
 }
