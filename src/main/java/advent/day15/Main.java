@@ -48,7 +48,7 @@ public class Main {
         }
 
         System.out.println(pairCost.get(Pair.of(xMaxIndex, yMaxIndex)));
-        printPath(infiniteGrid, xMax, yMax, pairCost);
+//        printPath(infiniteGrid, xMax, yMax, pairCost);
     }
 
     private static Set<Pair<Integer, Integer>> fill(final Pair<Integer, Integer> point,
