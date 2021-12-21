@@ -21,11 +21,12 @@ public class Main {
         final Feed feed = new Feed(hexToBin(rawInputString));
         final boolean processNext = false;
 
-        processCount(feed, 1);
+        final List<Feed> feeds = processCount(feed, 1);
 
         System.out.println(feed.input);
         System.out.println("P1: " + versionSum);
         System.out.println("P2: " + feed.value);
+        System.out.println("feeds: " + feeds);
 //        System.out.printf("version sum %d%n", versionSum);
 
     }
@@ -61,6 +62,7 @@ public class Main {
             feed.processTypeLiteral();
         } else {
             feed.value = processOperator(feed);
+            System.out.println("op " + feed.value);
         }
         return new Feed(feed.input);
     }
@@ -95,18 +97,27 @@ public class Main {
             case MAXIMUM:
                 return processed.stream().mapToLong(Feed::getValue).max().getAsLong();
             case GREATER_THAN:
+                if (processed.size() != 2) {
+                    throw new IllegalStateException("not 2");
+                }
                 if (processed.get(0).getValue() > processed.get(1).getValue()) {
                     return 1;
                 } else {
                     return 0;
                 }
             case LESS_THAN:
+                if (processed.size() != 2) {
+                    throw new IllegalStateException("not 2");
+                }
                 if (processed.get(0).getValue() < processed.get(1).getValue()) {
                     return 1;
                 } else {
                     return 0;
                 }
             case EQUAL:
+                if (processed.size() != 2) {
+                    throw new IllegalStateException("not 2");
+                }
                 if (processed.get(0).getValue() == processed.get(1).getValue()) {
                     return 1;
                 } else {
