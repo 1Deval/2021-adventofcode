@@ -5,13 +5,10 @@ import advent.read.Util;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalLong;
 
 public class Main {
 
-
-    enum ParseMode {
-        LENGTH, PACKET_COUNT
-    }
 
     static int versionSum;
 
@@ -19,15 +16,12 @@ public class Main {
         final List<String> data = Util.getData("day16/input.txt");
         final String rawInputString = data.get(0);
         final Feed feed = new Feed(hexToBin(rawInputString));
-        final boolean processNext = false;
 
-        final List<Feed> feeds = processCount(feed, 1);
+        processCount(feed, 1);
 
         System.out.println(feed.input);
         System.out.println("P1: " + versionSum);
         System.out.println("P2: " + feed.value);
-        System.out.println("feeds: " + feeds);
-//        System.out.printf("version sum %d%n", versionSum);
 
     }
 
@@ -87,15 +81,23 @@ public class Main {
             case SUM:
                 return processed.stream().mapToLong(Feed::getValue).sum();
             case PRODUCT:
-                int val = 1;
+                long val = 1;
                 for (final Feed fd : processed) {
                     val *= fd.getValue();
                 }
                 return val;
             case MINIMUM:
-                return processed.stream().mapToLong(Feed::getValue).min().getAsLong();
+                final OptionalLong min = processed.stream().mapToLong(Feed::getValue).min();
+                if (min.isPresent()) {
+                    return min.getAsLong();
+                }
+                throw new IllegalStateException();
             case MAXIMUM:
-                return processed.stream().mapToLong(Feed::getValue).max().getAsLong();
+                final OptionalLong max = processed.stream().mapToLong(Feed::getValue).max();
+                if (max.isPresent()) {
+                    return max.getAsLong();
+                }
+                throw new IllegalStateException();
             case GREATER_THAN:
                 if (processed.size() != 2) {
                     throw new IllegalStateException("not 2");
@@ -128,21 +130,6 @@ public class Main {
         }
     }
 
-
-    private static int processTypeLiteralValue(final Feed feed) {
-        int val = 0;
-        boolean hasNext = true;
-        String nextBit;
-        while (hasNext) {
-            nextBit = feed.takeSubString(1);
-            val = val << 4;
-            val += feed.getLong(4);
-            hasNext = "1".equals(nextBit);
-        }
-        feed.value = val;
-        System.out.printf("parsed val: %d%n", val);
-        return val;
-    }
 
     static String hexToBin(final String hex) {
         final StringBuilder bin = new StringBuilder();
