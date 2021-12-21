@@ -5,6 +5,7 @@ public class Feed {
     PacketType packetType;
     final int originalLength;
     String input;
+    long value;
 
     public Feed(final String input) {
         this.input = input;
@@ -12,17 +13,17 @@ public class Feed {
     }
 
     void init() {
-        version = getInt(3);
-        packetType = PacketType.fromId(getInt(3));
+        version = (int) getLong(3);
+        packetType = PacketType.fromId((int) getLong(3));
     }
 
     int lengthProcessed() {
         return originalLength - input.length();
     }
 
-    int getInt(final int size) {
+    long getLong(final int size) {
         final String valueString = takeSubString(size);
-        return Integer.parseInt(valueString, 2);
+        return Long.parseLong(valueString, 2);
     }
 
     String takeSubString(final int size) {
@@ -32,17 +33,22 @@ public class Feed {
         return valueString;
     }
 
-    private static void processTypeLiteral(final Feed feed) {
-        int val = 0;
+    public long getValue() {
+        return value;
+    }
+
+     void processTypeLiteral() {
+        long val = 0;
         boolean hasNext = true;
         String nextBit;
         while (hasNext) {
-            nextBit = feed.takeSubString(1);
+            nextBit = takeSubString(1);
             val = val << 4;
-            val += feed.getInt(4);
+            val += getLong(4);
             hasNext = "1".equals(nextBit);
         }
         System.out.printf("parsed val: %d%n", val);
+        value = val;
     }
 
     void printVersionAndPacketId() {

@@ -3,21 +3,20 @@ package advent.day16;
 import advent.read.Util;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-
-
 
 
     enum ParseMode {
         LENGTH, PACKET_COUNT
     }
 
-    static int version;
+    static int versionSum;
 
     public static void main(final String... args) throws IOException {
-        final List<String> data = Util.getData("day16/sample.txt");
+        final List<String> data = Util.getData("day16/input.txt");
         final String rawInputString = data.get(0);
         final Feed feed = new Feed(hexToBin(rawInputString));
         final boolean processNext = false;
@@ -25,55 +24,96 @@ public class Main {
         processCount(feed, 1);
 
         System.out.println(feed.input);
-        System.out.println("P1: " + version);
+        System.out.println("P1: " + versionSum);
+        System.out.println("P2: " + feed.value);
 //        System.out.printf("version sum %d%n", versionSum);
 
     }
 
-    static int processCount(final Feed feed, final int countLimit) {
-        int sizeProcessed = 0;
+    static List<Feed> processCount(final Feed feed, final long countLimit) {
+        final List<Feed> processed = new ArrayList<>();
         Feed feedLocal = feed;
         for (int i = 0; i < countLimit; i++) {
             final Feed remainder = processPacket(feedLocal);
-            sizeProcessed += feedLocal.lengthProcessed();
+            processed.add(feedLocal);
             feedLocal = remainder;
         }
-        return sizeProcessed;
+        return processed;
     }
 
-    static void processLength(final Feed feed, final int lengthLimit) {
+    static List<Feed> processLength(final Feed feed, final long lengthLimit) {
+        final List<Feed> processed = new ArrayList<>();
         Feed feedLocal = feed;
         for (int i = 0; i < lengthLimit; ) {
             final Feed remainder = processPacket(feedLocal);
             i += feedLocal.lengthProcessed();
+            processed.add(feedLocal);
             feedLocal = remainder;
         }
+        return processed;
     }
 
     private static Feed processPacket(final Feed feed) {
         feed.init();
         feed.printVersionAndPacketId();
-        version += feed.version;
+        versionSum += feed.version;
         if (feed.packetType == PacketType.LITERAL) {
-            processTypeLiteralValue(feed);
+            feed.processTypeLiteral();
         } else {
-            processOperator(feed);
+            feed.value = processOperator(feed);
         }
         return new Feed(feed.input);
     }
 
-    private static void processOperator(final Feed feed) {
+    private static long processOperator(final Feed feed) {
         final String lengthType = feed.takeSubString(1);
+        final List<Feed> processed;
         System.out.println("length bit " + lengthType);
         if ("0".equals(lengthType)) {
-            final int processingLength = feed.getInt(15);
-            final Feed newFeed = new Feed(feed.takeSubString(processingLength));
-            processLength(newFeed, processingLength);
+            final long processingLength = feed.getLong(15);
+            final Feed newFeed = new Feed(feed.takeSubString((int) processingLength));
+            processed = processLength(newFeed, processingLength);
         } else {
-            final int packetCountLimit = feed.getInt(11);
+            final long packetCountLimit = feed.getLong(11);
             final Feed newFeed = new Feed(feed.input);
-            final int size = processCount(newFeed, packetCountLimit);
+            processed = processCount(newFeed, packetCountLimit);
+            final int size = processed.stream().mapToInt(Feed::lengthProcessed).sum();
             feed.takeSubString(size);
+        }
+        switch (feed.packetType) {
+
+            case SUM:
+                return processed.stream().mapToLong(Feed::getValue).sum();
+            case PRODUCT:
+                int val = 1;
+                for (final Feed fd : processed) {
+                    val *= fd.getValue();
+                }
+                return val;
+            case MINIMUM:
+                return processed.stream().mapToLong(Feed::getValue).min().getAsLong();
+            case MAXIMUM:
+                return processed.stream().mapToLong(Feed::getValue).max().getAsLong();
+            case GREATER_THAN:
+                if (processed.get(0).getValue() > processed.get(1).getValue()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            case LESS_THAN:
+                if (processed.get(0).getValue() < processed.get(1).getValue()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            case EQUAL:
+                if (processed.get(0).getValue() == processed.get(1).getValue()) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            default:
+                throw new IllegalStateException("not acceptable");
         }
     }
 
@@ -85,9 +125,10 @@ public class Main {
         while (hasNext) {
             nextBit = feed.takeSubString(1);
             val = val << 4;
-            val += feed.getInt(4);
+            val += feed.getLong(4);
             hasNext = "1".equals(nextBit);
         }
+        feed.value = val;
         System.out.printf("parsed val: %d%n", val);
         return val;
     }
