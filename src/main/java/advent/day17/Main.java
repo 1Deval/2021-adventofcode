@@ -45,7 +45,7 @@ public class Main {
                 }
             }
         }
-        System.out.println(inRange);
+        System.out.println("P2: "+inRange);
     }
 
 
