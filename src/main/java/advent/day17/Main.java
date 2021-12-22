@@ -16,7 +16,11 @@ public class Main {
 
         final int dip = Math.abs(yRange.min);
 
-        System.out.println("P1:" + (dip * (dip + 1) / 2 - dip));
+        final int yMax = dip * (dip + 1) / 2 - dip;
+        final int xMin = (int) ((-1 + Math.sqrt(1 + 8 * xRange.min))/2);
+        System.out.println("P1:" + yMax);
+        System.out.println("yMax:" + yMax);
+        System.out.println("xMin:" + xMin);
     }
 
     private static Range getRange(final String label, final String line) {
@@ -24,7 +28,8 @@ public class Main {
         final Matcher matcher = rangePattern.matcher(line);
         if (matcher.matches()) {
             return new Range(Integer.parseInt(matcher.group("min")), Integer.parseInt(matcher.group("max")));
+        } else {
+            throw new IllegalStateException();
         }
-        return null;
     }
 }
