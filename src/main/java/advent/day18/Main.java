@@ -3,8 +3,6 @@ package advent.day18;
 import advent.read.Util;
 
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,7 +19,7 @@ public class Main {
 //            } else {
 //                number = number.add(toSnailFileR(row));
 //            }
-//            System.out.println(toSnailFileR(row));
+            System.out.println(toSnailFileR(row));
         }
 
         System.out.println(number);
@@ -59,18 +57,18 @@ public class Main {
     }
 
     private static int findClosingIndex(final String line) {
-        final Deque<Object> stack = new ArrayDeque<>();
+        int count = 0;
         for (int i = 0; i < line.length(); i++) {
             final char c = line.charAt(i);
             switch (c) {
                 case '[':
-                    stack.push('[');
+                    count++;
                     break;
                 case ']':
-                    stack.pop();
+                    count--;
                     break;
             }
-            if (stack.isEmpty()) {
+            if (count == 0) {
                 return i;
             }
         }
