@@ -1,5 +1,7 @@
 package advent.day18;
 
+import advent.utils.Color;
+
 import java.util.Objects;
 
 public class Complex implements SnailFish {
@@ -69,6 +71,18 @@ public class Complex implements SnailFish {
         left = left.split();
         right = right.split();
         return this;
+    }
+
+    @Override
+    public String coloredString(final int level) {
+        final String toString = String.format("[%s,%s]", left.coloredString(level + 1), right.coloredString(level + 1));
+        if (level > 3) {
+            return Color.ANSI_RED.wrap(toString);
+//        } else if (level == 3) {
+//            return Color.ANSI_YELLOW.wrap(toString);
+        } else {
+            return toString;
+        }
     }
 
     void addLiteralToLeft(final Literal value) {

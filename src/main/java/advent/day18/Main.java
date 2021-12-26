@@ -21,13 +21,13 @@ public class Main {
             }
 //            final SnailFish number = toSnailFileR(row);
             String before;
-            System.out.println("Before Loop: " + number);
+            System.out.println("Before Loop: " + number.coloredString());
             do {
                 before = number.toString();
                 number.explode();
-                System.out.println("after explode: " + number);
+                System.out.println("after explode: " + number.coloredString());
                 number.split();
-                System.out.println(" after split : " + number);
+                System.out.println(" after split : " + number.coloredString());
             } while (!before.equals(number.toString()));
             System.out.println("end of loop: " + before);
         }

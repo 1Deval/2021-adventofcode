@@ -32,6 +32,17 @@ public class Literal implements SnailFish {
     }
 
     @Override
+    public String coloredString(final int level) {
+//        if (level > 4) {
+//            return Color.ANSI_RED.wrap(toString());
+//        } else if (level == 4) {
+//            return Color.ANSI_YELLOW.wrap(toString());
+//        } else {
+            return toString();
+//        }
+    }
+
+    @Override
     public String toString() {
         return Integer.toString(value);
     }
