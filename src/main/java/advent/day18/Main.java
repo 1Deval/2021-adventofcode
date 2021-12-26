@@ -11,17 +11,18 @@ import java.util.stream.Collectors;
 
 public class Main {
 
+    static List<String> data;
+
     public static void main(final String... args) throws IOException {
-        final List<SnailFish> allNumbers = getSnailFishNumbers();
+        data = Util.getData("day18/input.txt");
+
+        final List<SnailFish> allNumbers = readAllNumbers(data);
         System.out.println("P1 magnitude: " + sumAndMagnitude(allNumbers));
         System.out.println("P2 magnitude: " + maxForPair());
     }
 
-    private static List<SnailFish> getSnailFishNumbers() throws IOException {
-        final List<String> data = Util.getData("day18/input.txt");
-
-        final List<SnailFish> allNumbers = readAllNumbers(data);
-        return allNumbers;
+    private static SnailFish getSnailFishNumber(final int index) throws IOException {
+        return toSnailFishNumber(data.get(index));
     }
 
     private static List<SnailFish> readAllNumbers(final List<String> data) {
@@ -30,12 +31,11 @@ public class Main {
 
     private static long maxForPair() throws IOException {
         long magMax = 0;
-        final int numbersSize = getSnailFishNumbers().size();
+        final int numbersSize = data.size();
         for (int i = 0; i < numbersSize; i++) {
             for (int j = 0; j < numbersSize; j++) {
                 if (i != j) {
-                    final List<SnailFish> allNumbers = getSnailFishNumbers();
-                    final long mag = sumAndMagnitude(Arrays.asList(allNumbers.get(i), allNumbers.get(j)));
+                    final long mag = sumAndMagnitude(Arrays.asList(getSnailFishNumber(i), getSnailFishNumber(j)));
                     magMax = Math.max(magMax, mag);
                 }
             }
