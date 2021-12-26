@@ -1,5 +1,7 @@
 package advent.day18;
 
+import advent.utils.Pair;
+
 import java.util.Objects;
 
 public class Literal implements SnailFish {
@@ -18,28 +20,27 @@ public class Literal implements SnailFish {
     }
 
     @Override
-    public SnailFish explode(final int level) {
+    public SnailFish explode(final int level, final int depthLimit) {
         return null;
     }
 
     @Override
-    public SnailFish split() {
+    public Pair<SnailFish, Boolean> split() {
         if (value > 9) {
-            return new Complex(new Literal(value / 2), new Literal(value - value / 2));
+            return Pair.of(new Complex(new Literal(value / 2), new Literal(value - value / 2)), true);
         } else {
-            return this;
+            return Pair.of(this, false);
         }
     }
 
     @Override
     public String coloredString(final int level) {
-//        if (level > 4) {
-//            return Color.ANSI_RED.wrap(toString());
-//        } else if (level == 4) {
-//            return Color.ANSI_YELLOW.wrap(toString());
-//        } else {
-            return toString();
-//        }
+        return toString();
+    }
+
+    @Override
+    public long magnitude() {
+        return value;
     }
 
     @Override

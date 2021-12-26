@@ -1,6 +1,7 @@
 package advent.day18;
 
 import advent.utils.Color;
+import advent.utils.Pair;
 
 import java.util.Objects;
 
@@ -19,11 +20,9 @@ public class Complex implements SnailFish {
     }
 
     @Override
-    public SnailFish explode(final int level) {
+    public SnailFish explode(final int level, final int depthLimit) {
 
-
-        if (left instanceof Complex && level >= 3 && ((Complex) left).right instanceof Literal && ((Complex) left).left instanceof Literal) {
-            System.out.println("to be forgotten left " + left);
+        if (left instanceof Complex && level >= depthLimit && ((Complex) left).right instanceof Literal && ((Complex) left).left instanceof Literal) {
             if (right instanceof Complex) {
                 ((Complex) right).addLiteralToLeft((Literal) ((Complex) left).right);
             } else {
@@ -32,8 +31,7 @@ public class Complex implements SnailFish {
             final Complex resp = new Complex(new Literal(((Literal) (((Complex) left).left)).value), new Literal(0));
             left = new Literal(0);
             return resp;
-        } else if (right instanceof Complex && level >= 3 && ((Complex) right).left instanceof Literal && ((Complex) right).right instanceof Literal) {
-            System.out.println("to be forgotten right " + right);
+        } else if (right instanceof Complex && level >= depthLimit && ((Complex) right).left instanceof Literal && ((Complex) right).right instanceof Literal) {
             if (left instanceof Complex) {
                 ((Complex) left).addLiteralToRight((Literal) ((Complex) right).left);
             } else {
@@ -43,7 +41,7 @@ public class Complex implements SnailFish {
             right = new Literal(0);
             return resp;
         } else {
-            final Complex leftExplosion = (Complex) left.explode(level + 1);
+            final Complex leftExplosion = (Complex) left.explode(level + 1, depthLimit);
             if (leftExplosion != null) {
                 if (right instanceof Literal) {
                     right = right.add(leftExplosion.right);
@@ -52,7 +50,7 @@ public class Complex implements SnailFish {
                 }
                 return new Complex(leftExplosion.left, new Literal(0));
             }
-            final Complex rightExplosion = (Complex) right.explode(level + 1);
+            final Complex rightExplosion = (Complex) right.explode(level + 1, depthLimit);
             if (rightExplosion != null) {
                 if (left instanceof Literal) {
                     left = left.add(rightExplosion.left);
@@ -67,10 +65,18 @@ public class Complex implements SnailFish {
     }
 
     @Override
-    public SnailFish split() {
-        left = left.split();
-        right = right.split();
-        return this;
+    public Pair<SnailFish, Boolean> split() {
+        final Pair<SnailFish, Boolean> leftSplit = left.split();
+        if (leftSplit.getSecondValue()) {
+            left = leftSplit.getFirstValue();
+            return Pair.of(this, true);
+        }
+        final Pair<SnailFish, Boolean> rightSplit = right.split();
+        if (rightSplit.getSecondValue()) {
+            right = rightSplit.getFirstValue();
+            return Pair.of(this, true);
+        }
+        return Pair.of(this, false);
     }
 
     @Override
@@ -83,6 +89,11 @@ public class Complex implements SnailFish {
         } else {
             return toString;
         }
+    }
+
+    @Override
+    public long magnitude() {
+        return left.magnitude() * 3 + 2 * right.magnitude();
     }
 
     void addLiteralToLeft(final Literal value) {

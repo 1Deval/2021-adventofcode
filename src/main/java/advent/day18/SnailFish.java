@@ -1,21 +1,24 @@
 package advent.day18;
 
+import advent.utils.Pair;
+
 interface SnailFish {
     SnailFish add(SnailFish snailFish);
 
-    SnailFish explode(int level);
+    SnailFish explode(int level, int depthLimit);
 
     default SnailFish explode() {
-        final SnailFish explode = explode(0);
-        System.out.println("intf" + explode);
-        return explode;
+//        System.out.println("limit: " + depthLimit);
+        return explode(0, 3);
     }
 
-    SnailFish split();
+    Pair<SnailFish, Boolean> split();
 
     String coloredString(int level);
 
     default String coloredString() {
         return coloredString(0);
     }
+
+    long magnitude();
 }

@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 public class Main {
 
     public static void main(final String... args) throws IOException {
-        final List<String> data = Util.getData("day18/sample.txt");
+        final List<String> data = Util.getData("day18/input.txt");
 
         SnailFish number = null;
         for (final String row : data) {
@@ -19,20 +19,18 @@ public class Main {
             } else {
                 number = number.add(toSnailFileR(row));
             }
-//            final SnailFish number = toSnailFileR(row);
             String before;
-            System.out.println("Before Loop: " + number.coloredString());
             do {
                 before = number.toString();
-                number.explode();
-                System.out.println("after explode: " + number.coloredString());
+                final SnailFish explode = number.explode();
+                if (explode != null) {
+                    continue;
+                }
                 number.split();
-                System.out.println(" after split : " + number.coloredString());
             } while (!before.equals(number.toString()));
-            System.out.println("end of loop: " + before);
         }
 
-//        System.out.println(number);
+        System.out.println("P1 magnitude: " + number.magnitude());
     }
 
     private static SnailFish toSnailFileR(final String line) {
