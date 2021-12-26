@@ -6,34 +6,28 @@ import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Main {
 
     public static void main(final String... args) throws IOException {
         final List<String> data = Util.getData("day18/input.txt");
 
-        SnailFish number = null;
-        for (final String row : data) {
-            if (number == null) {
-                number = toSnailFileR(row);
-            } else {
-                number = number.add(toSnailFileR(row));
-            }
-            String before;
-            do {
-                before = number.toString();
-                final SnailFish explode = number.explode();
-                if (explode != null) {
-                    continue;
-                }
-                number.split();
-            } while (!before.equals(number.toString()));
-        }
+        final List<SnailFish> allNumbers = data.stream().map(Main::toSnailFishNumber).collect(Collectors.toList());
 
-        System.out.println("P1 magnitude: " + number.magnitude());
+
+        System.out.println("P1 magnitude: " + sumAndMagnitude(allNumbers));
     }
 
-    private static SnailFish toSnailFileR(final String line) {
+    private static long sumAndMagnitude(final List<SnailFish> numbers) {
+        SnailFish number = numbers.get(0);
+        for (int i = 1; i < numbers.size(); i++) {
+            number = number.add(numbers.get(i));
+        }
+        return number.magnitude();
+    }
+
+    private static SnailFish toSnailFishNumber(final String line) {
         final Pattern pattern = Pattern.compile("^(?<left>\\d),(?<right>\\d)$");
         final Matcher matcher = pattern.matcher(line);
         if (matcher.matches()) {
@@ -45,21 +39,21 @@ public class Main {
         if (line.startsWith("[")) {
             final int closingIndex = findClosingIndex(line);
             if (closingIndex == line.length() - 1) {
-                return toSnailFileR(line.substring(1, line.length() - 1));
+                return toSnailFishNumber(line.substring(1, line.length() - 1));
             } else {
                 return new Complex(
-                        toSnailFileR(line.substring(1, closingIndex)),
-                        toSnailFileR(line.substring(closingIndex + 2))
+                        toSnailFishNumber(line.substring(1, closingIndex)),
+                        toSnailFishNumber(line.substring(closingIndex + 2))
                 );
             }
         }
         final char startingChar = line.charAt(0);
         if (isDigit(startingChar)) {
-            return new Complex(new Literal(Integer.parseInt(String.valueOf(startingChar))), toSnailFileR(line.substring(3, line.length() - 1)));
+            return new Complex(new Literal(Integer.parseInt(String.valueOf(startingChar))), toSnailFishNumber(line.substring(3, line.length() - 1)));
         }
         final char endingChar = line.charAt(line.length() - 1);
         if (isDigit(endingChar)) {
-            return new Complex(toSnailFileR(line.substring(0, line.length() - 3)), new Literal(Integer.parseInt(String.valueOf(startingChar))));
+            return new Complex(toSnailFishNumber(line.substring(0, line.length() - 3)), new Literal(Integer.parseInt(String.valueOf(startingChar))));
         }
         throw new IllegalStateException();
     }
@@ -87,13 +81,4 @@ public class Main {
         return startingChar >= '0' && startingChar <= '9';
     }
 
-
-    static SnailFish toLiteral(final String row) {
-        final Pattern pattern = Pattern.compile("\\[(?<left>\\d+),(?<right>\\d+)]");
-        final Matcher matcher = pattern.matcher(row);
-        if (!matcher.matches()) {
-            throw new IllegalStateException();
-        }
-        return new Complex(new Literal(Integer.parseInt(matcher.group("left"))), new Literal(Integer.parseInt(matcher.group("right"))));
-    }
 }

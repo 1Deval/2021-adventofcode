@@ -16,7 +16,7 @@ public class Complex implements SnailFish {
 
     @Override
     public SnailFish add(final SnailFish snailFish) {
-        return new Complex(this, snailFish);
+        return new Complex(this, snailFish).reduce();
     }
 
     @Override

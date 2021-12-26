@@ -8,8 +8,20 @@ interface SnailFish {
     SnailFish explode(int level, int depthLimit);
 
     default SnailFish explode() {
-//        System.out.println("limit: " + depthLimit);
         return explode(0, 3);
+    }
+
+    default SnailFish reduce() {
+        String before;
+        do {
+            before = toString();
+            final SnailFish explode = explode();
+            if (explode != null) {
+                continue;
+            }
+            split();
+        } while (!before.equals(toString()));
+        return this;
     }
 
     Pair<SnailFish, Boolean> split();
