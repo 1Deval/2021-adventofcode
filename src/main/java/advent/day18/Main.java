@@ -3,6 +3,7 @@ package advent.day18;
 import advent.read.Util;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,12 +12,35 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(final String... args) throws IOException {
+        final List<SnailFish> allNumbers = getSnailFishNumbers();
+        System.out.println("P1 magnitude: " + sumAndMagnitude(allNumbers));
+        System.out.println("P2 magnitude: " + maxForPair());
+    }
+
+    private static List<SnailFish> getSnailFishNumbers() throws IOException {
         final List<String> data = Util.getData("day18/input.txt");
 
-        final List<SnailFish> allNumbers = data.stream().map(Main::toSnailFishNumber).collect(Collectors.toList());
+        final List<SnailFish> allNumbers = readAllNumbers(data);
+        return allNumbers;
+    }
 
+    private static List<SnailFish> readAllNumbers(final List<String> data) {
+        return data.stream().map(Main::toSnailFishNumber).collect(Collectors.toList());
+    }
 
-        System.out.println("P1 magnitude: " + sumAndMagnitude(allNumbers));
+    private static long maxForPair() throws IOException {
+        long magMax = 0;
+        final int numbersSize = getSnailFishNumbers().size();
+        for (int i = 0; i < numbersSize; i++) {
+            for (int j = 0; j < numbersSize; j++) {
+                if (i != j) {
+                    final List<SnailFish> allNumbers = getSnailFishNumbers();
+                    final long mag = sumAndMagnitude(Arrays.asList(allNumbers.get(i), allNumbers.get(j)));
+                    magMax = Math.max(magMax, mag);
+                }
+            }
+        }
+        return magMax;
     }
 
     private static long sumAndMagnitude(final List<SnailFish> numbers) {
