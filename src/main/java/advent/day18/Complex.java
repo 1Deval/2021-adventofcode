@@ -17,8 +17,74 @@ public class Complex implements SnailFish {
     }
 
     @Override
-    public SnailFish getExplosion(final int level) {
+    public SnailFish explode(final int level) {
+
+
+        if (left instanceof Complex && level >= 3 && ((Complex) left).right instanceof Literal && ((Complex) left).left instanceof Literal) {
+            System.out.println("to be forgotten left " + left);
+            if (right instanceof Complex) {
+                ((Complex) right).addLiteralToLeft((Literal) ((Complex) left).right);
+            } else {
+                right = right.add(((Complex) left).right);
+            }
+            final Complex resp = new Complex(new Literal(((Literal) (((Complex) left).left)).value), new Literal(0));
+            left = new Literal(0);
+            return resp;
+        } else if (right instanceof Complex && level >= 3 && ((Complex) right).left instanceof Literal && ((Complex) right).right instanceof Literal) {
+            System.out.println("to be forgotten right " + right);
+            if (left instanceof Complex) {
+                ((Complex) left).addLiteralToRight((Literal) ((Complex) right).left);
+            } else {
+                left = left.add(((Complex) right).left);
+            }
+            final Complex resp = new Complex(new Literal(0), new Literal(((Literal) (((Complex) right).right)).value));
+            right = new Literal(0);
+            return resp;
+        } else {
+            final Complex leftExplosion = (Complex) left.explode(level + 1);
+            if (leftExplosion != null) {
+                if (right instanceof Literal) {
+                    right = right.add(leftExplosion.right);
+                } else {
+                    ((Complex) right).addLiteralToLeft((Literal) leftExplosion.right);
+                }
+                return new Complex(leftExplosion.left, new Literal(0));
+            }
+            final Complex rightExplosion = (Complex) right.explode(level + 1);
+            if (rightExplosion != null) {
+                if (left instanceof Literal) {
+                    left = left.add(rightExplosion.left);
+                } else {
+                    ((Complex) left).addLiteralToRight((Literal) rightExplosion.left);
+                }
+                return new Complex(new Literal(0), rightExplosion.right);
+            }
+        }
+
         return null;
+    }
+
+    @Override
+    public SnailFish split() {
+        left = left.split();
+        right = right.split();
+        return this;
+    }
+
+    void addLiteralToLeft(final Literal value) {
+        if (left instanceof Literal) {
+            left = left.add(value);
+        } else if (left instanceof Complex) {
+            ((Complex) left).addLiteralToLeft(value);
+        }
+    }
+
+    void addLiteralToRight(final Literal value) {
+        if (right instanceof Literal) {
+            right = right.add(value);
+        } else if (right instanceof Complex) {
+            ((Complex) right).addLiteralToRight(value);
+        }
     }
 
     @Override

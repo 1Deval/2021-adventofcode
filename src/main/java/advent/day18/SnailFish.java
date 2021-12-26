@@ -2,5 +2,12 @@ package advent.day18;
 
 interface SnailFish {
     SnailFish add(SnailFish snailFish);
-    SnailFish getExplosion(int level);
+    SnailFish explode(int level);
+    default SnailFish explode() {
+        final SnailFish explode = explode(0);
+        System.out.println("intf" + explode);
+        return explode;
+    }
+
+    SnailFish split();
 }

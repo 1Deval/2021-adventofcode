@@ -11,12 +11,24 @@ public class Literal implements SnailFish {
 
     @Override
     public SnailFish add(final SnailFish snailFish) {
-        throw new UnsupportedOperationException();
+        if (!(snailFish instanceof Literal)) {
+            throw new UnsupportedOperationException();
+        }
+        return new Literal(value + ((Literal) snailFish).value);
     }
 
     @Override
-    public SnailFish getExplosion(final int level) {
-        throw new UnsupportedOperationException();
+    public SnailFish explode(final int level) {
+        return null;
+    }
+
+    @Override
+    public SnailFish split() {
+        if (value > 9) {
+            return new Complex(new Literal(value / 2), new Literal(value - value / 2));
+        } else {
+            return this;
+        }
     }
 
     @Override
