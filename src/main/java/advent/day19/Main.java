@@ -1,63 +1,81 @@
 package advent.day19;
 
 import advent.read.Util;
+import advent.utils.Pair;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Main {
+
+
     public static void main(final String... args) throws IOException {
         final List<String> data = Util.getData("day19/sample.txt");
 
         final List<Scanner> scanners = parseScanners(data);
 
-        final Multiset<Coordinate> counts = HashMultiset.create();
-        for (int i = 0; i < scanners.size(); i++) {
-            for (int j = 1; j < scanners.size(); j++) {
-                if (i != j) {
-//                    Map<Coordinate, Coordinate> scanner1Map = new HashMap<>();
-                    final Scanner scanner1 = scanners.get(i);
-                    final Scanner scanner2 = scanners.get(j);
-                    final List<Scanner> variations = scanner1.getVariations();
-                    for (int variation1index = 0; variation1index < variations.size(); variation1index++) {
-                        final Scanner variation1 = variations.get(variation1index);
-                        final List<Scanner> scanner2Variations = scanner2.getVariations();
-                        for (int variation2Index = 0; variation2Index < scanner2Variations.size(); variation2Index++) {
-                            final Scanner variation2 = scanner2Variations.get(variation2Index);
-                            for (final Coordinate coordinate1 : variation1.coordinates) {
-                                for (final Coordinate coordinate2 : variation2.coordinates) {
-                                    final Coordinate difference = coordinate1.difference(coordinate2);
-                                    counts.add(difference);
-//                                    scanner1Map.putIfAbsent(difference, coordinate1);
-                                }
-                            }
-                        }
+
+        final Scanner base = scanners.get(0);
+        final Set<Coordinate> foundBeacons = new HashSet<>(base.coordinates);
+        for (int i = 1; i < scanners.size(); i++) {
+            final Scanner underComparison = scanners.get(i);
+            final List<Scanner> variations = underComparison.getVariations();
+
+            final PriorityQueue<Pair<Integer, Pair<Coordinate, Integer>>> likelyVariation = new PriorityQueue<>(Comparator.<Pair<Integer, Pair<Coordinate, Integer>>, Integer>comparing(integerPairPair -> integerPairPair.getSecondValue().getSecondValue()).reversed());
+
+            for (int variationIndex = 0; variationIndex < variations.size(); variationIndex++) {
+                final Multiset<Coordinate> countsLocal = HashMultiset.create();
+                for (final Coordinate coordinateBase : foundBeacons) {
+                    for (final Coordinate coordinate2 : variations.get(variationIndex).coordinates) {
+                        final Coordinate difference = coordinateBase.difference(coordinate2);
+                        countsLocal.add(difference);
                     }
-                    dropBottom(counts);
-//                    scanner1Map.keySet().retainAll(counts.elementSet());
-                    System.out.println(counts);
-//                    System.out.println(scanner1Map);
-                    counts.clear();
+                }
+                dropBottom(countsLocal);
+                if (!countsLocal.entrySet().isEmpty()) {
+                    System.out.println(countsLocal);
+                    for (final Multiset.Entry<Coordinate> coordinateEntry : countsLocal.entrySet()) {
+                        likelyVariation.add(Pair.of(variationIndex, Pair.of(coordinateEntry.getElement(), coordinateEntry.getCount())));
+                    }
                 }
             }
-        }
-        for (final Multiset.Entry<Coordinate> coordinateEntry : counts.entrySet()) {
-            System.out.println("element" + coordinateEntry.getElement());
-            for (final Coordinate coordinate : scanners.get(0).coordinates) {
-                System.out.println(coordinate.difference(coordinateEntry.getElement()));
+
+            final Pair<Integer, Pair<Coordinate, Integer>> poll = likelyVariation.poll();
+            final Scanner variationFound;
+            if (poll != null) {
+                variationFound = variations.get(poll.getFirstValue());
+//            foundBeacons.retainAll(variationFound.coordinates.stream().map(coordinate -> coordinate.add(poll.getSecondValue().getFirstValue())).collect(Collectors.toList()));
+                for (final Coordinate coordinate : variationFound.coordinates) {
+                    final Coordinate relativeToBase = coordinate.add(poll.getSecondValue().getFirstValue());
+                    foundBeacons.add(relativeToBase);
+                }
             }
-            System.out.println("---");
+            System.out.println("coordinate poll" + poll);
+
         }
-//        System.out.println(counts);
+        System.out.println(foundBeacons.size());
+
+        for (final String str : foundBeacons.stream().sorted().map(Coordinate::toString).collect(Collectors.toList())) {
+            System.out.println(str);
+        }
+
     }
 
     private static void dropBottom(final Multiset<Coordinate> counts) {
         final int maxCount = counts.entrySet().stream().mapToInt(Multiset.Entry::getCount).max().getAsInt();
-        counts.removeIf(coordinate -> counts.count(coordinate) < maxCount);
+        counts.removeIf(coordinate -> {
+            final int count = counts.count(coordinate);
+            return count == 1 || count < maxCount;
+        });
     }
 
     private static List<Scanner> parseScanners(final List<String> data) {
