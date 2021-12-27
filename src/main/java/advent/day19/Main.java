@@ -8,12 +8,11 @@ import com.google.common.collect.Multiset;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.TreeSet;
 
 public class Main {
 
@@ -25,7 +24,7 @@ public class Main {
 
 
         final Scanner base = scanners.get(0);
-        final Set<Coordinate> foundBeacons = new HashSet<>(base.coordinates);
+        final Set<Coordinate> foundBeacons = new TreeSet<>(base.coordinates);
         for (int i = 1; i < scanners.size(); i++) {
             final Scanner underComparison = scanners.get(i);
             final List<Scanner> variations = underComparison.getVariations();
@@ -56,17 +55,26 @@ public class Main {
 //            foundBeacons.retainAll(variationFound.coordinates.stream().map(coordinate -> coordinate.add(poll.getSecondValue().getFirstValue())).collect(Collectors.toList()));
                 for (final Coordinate coordinate : variationFound.coordinates) {
                     final Coordinate relativeToBase = coordinate.add(poll.getSecondValue().getFirstValue());
+                    if (foundBeacons.contains(relativeToBase)) {
+                        System.out.println(relativeToBase);
+                    }
                     foundBeacons.add(relativeToBase);
                 }
+            } else {
+                System.err.println("No poll");
             }
-            System.out.println("coordinate poll" + poll);
+            System.out.println("coordinate poll for " + i + " " + poll);
 
+            System.out.println(foundBeacons.size());
         }
-        System.out.println(foundBeacons.size());
 
-        for (final String str : foundBeacons.stream().sorted().map(Coordinate::toString).collect(Collectors.toList())) {
-            System.out.println(str);
-        }
+//        for (final String str : foundBeacons.stream().map(Coordinate::toString).collect(Collectors.toList())) {
+//            System.out.println(str);
+//        }
+
+//        for (final String str : foundBeacons.stream().sorted().map(Coordinate::toString).collect(Collectors.toList())) {
+//            System.out.println(str);
+//        }
 
     }
 
@@ -74,7 +82,7 @@ public class Main {
         final int maxCount = counts.entrySet().stream().mapToInt(Multiset.Entry::getCount).max().getAsInt();
         counts.removeIf(coordinate -> {
             final int count = counts.count(coordinate);
-            return count == 1 || count < maxCount;
+            return count <3 || count < maxCount;
         });
     }
 
