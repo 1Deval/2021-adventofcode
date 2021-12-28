@@ -27,18 +27,8 @@ public class Main {
 
         System.out.println(scanners.get(0).coordinates.size());
         visit(scanners);
-        Map<Integer, Integer> visitMap = visit(scanners);
-        for (int i = 1; i < scanners.size(); i++) {
-            if (visitMap.containsKey(i)) {
-                final int to = visitMap.get(i);
-                final Scanner beacons = scanners.get(to).findBeacons(scanners.get(i));
-                if (beacons != null) {
-                    scanners.set(to, beacons);
-                }
-            }
-        }
         visit(scanners);
-        visitMap = visit(scanners);
+        final Map<Integer, Integer> visitMap = visit(scanners);
         for (int i = 1; i < scanners.size(); i++) {
             if (visitMap.containsKey(i)) {
                 final int to = visitMap.get(i);
@@ -46,9 +36,33 @@ public class Main {
                 if (beacons != null) {
                     scanners.set(to, beacons);
                 }
+            } else {
+                System.out.println("not found " + i);
             }
         }
 
+        for (int i = 1; i < scanners.size(); i++) {
+            if (visitMap.containsKey(i)) {
+                final int to = visitMap.get(i);
+                final Scanner beacons = scanners.get(to).findBeacons(scanners.get(i));
+                if (beacons != null) {
+                    scanners.set(to, beacons);
+                }
+            } else {
+                System.out.println("not found " + i);
+            }
+        }
+        for (int i = 1; i < scanners.size(); i++) {
+            if (visitMap.containsKey(i)) {
+                final int to = visitMap.get(i);
+                final Scanner beacons = scanners.get(to).findBeacons(scanners.get(i));
+                if (beacons != null) {
+                    scanners.set(to, beacons);
+                }
+            } else {
+                System.out.println("not found " + i);
+            }
+        }
 
         System.out.println(scanners.get(0).coordinates.size());
 

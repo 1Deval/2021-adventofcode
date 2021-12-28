@@ -23,7 +23,7 @@ public class Scanner {
 
 
     List<Scanner> getVariations() {
-        final int variationCount = 24;
+        final int variationCount = 36;
         final List<List<Coordinate>> varyingCoordinates = new ArrayList<>();
         // init
         for (int i = 0; i < variationCount; i++) {
@@ -62,8 +62,8 @@ public class Scanner {
         coordinates.add(new Coordinate(y, z, x));
 
 
-//        coordinates.add(new Coordinate(y,x, z));
-//        coordinates.add(new Coordinate(z, x, y));
+        coordinates.add(new Coordinate(y,x, z));
+        coordinates.add(new Coordinate(z, x, y));
 
         return coordinates;
 
