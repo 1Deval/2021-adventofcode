@@ -1,7 +1,6 @@
 package advent.day19;
 
 import advent.read.Util;
-import com.google.common.collect.Multiset;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,32 +25,8 @@ public class Main {
         final Scanner base = scanners.get(0);
 
         System.out.println(scanners.get(0).coordinates.size());
-        visit(scanners);
-        visit(scanners);
+//        visit(scanners);
         final Map<Integer, Integer> visitMap = visit(scanners);
-        for (int i = 1; i < scanners.size(); i++) {
-            if (visitMap.containsKey(i)) {
-                final int to = visitMap.get(i);
-                final Scanner beacons = scanners.get(to).findBeacons(scanners.get(i));
-                if (beacons != null) {
-                    scanners.set(to, beacons);
-                }
-            } else {
-                System.out.println("not found " + i);
-            }
-        }
-
-        for (int i = 1; i < scanners.size(); i++) {
-            if (visitMap.containsKey(i)) {
-                final int to = visitMap.get(i);
-                final Scanner beacons = scanners.get(to).findBeacons(scanners.get(i));
-                if (beacons != null) {
-                    scanners.set(to, beacons);
-                }
-            } else {
-                System.out.println("not found " + i);
-            }
-        }
         for (int i = 1; i < scanners.size(); i++) {
             if (visitMap.containsKey(i)) {
                 final int to = visitMap.get(i);
@@ -152,13 +127,15 @@ public class Main {
         }
         visited.add(poll);
         final Set<Integer> surround = new HashSet<>();
-        for (int i = 0; i < scanners.size(); i++) {
-            if (i != poll && !visitMap.containsKey(i)) {
-                final Scanner beacons = scanners.get(poll).findBeacons(scanners.get(i));
-                if (beacons != null) {
-                    visitMap.put(i, poll);
-                    surround.add(i);
-                    scanners.set(poll, beacons);
+        for (int i = 1; i < scanners.size(); i++) {
+            for (int i1 = 0; i1 < visited.size(); i1++) {
+                if (i != i1 && !visitMap.containsKey(i)) {
+                    final Scanner beacons = scanners.get(i1).findBeacons(scanners.get(i));
+                    if (beacons != null) {
+                        visitMap.put(i, poll);
+                        surround.add(i);
+                        scanners.set(i1, beacons);
+                    }
                 }
             }
         }
@@ -190,43 +167,6 @@ public class Main {
         }
 
         return localBase;
-    }
-
-    private static Scanner findBeacons(final Scanner base, final List<Scanner> scanners) {
-        if (scanners.isEmpty()) {
-            return base;
-        }
-        Scanner localBase = base;
-        final ArrayList<Scanner> localScanners = new ArrayList<>(scanners);
-        final ArrayList<Scanner> notFound = new ArrayList<>();
-        for (final Scanner localScanner : localScanners) {
-            final Scanner beacons = localBase.findBeacons(localScanner);
-            if (beacons == null) {
-                notFound.add(localScanner);
-            } else {
-                localBase = beacons;
-            }
-        }
-
-        final ArrayList<Scanner> prep = new ArrayList<>(notFound);
-        for (final Scanner scanner : scanners) {
-            prep.remove(scanner);
-            final Scanner beacons = findBeacons(scanner, prep);
-            if (beacons != null) {
-                final Scanner resp = localBase.findBeacons(beacons);
-                if (resp != null) {
-                    localBase = resp;
-                }
-            }
-        }
-        return localBase;
-    }
-
-    private static void dropBottom(final Multiset<Coordinate> counts) {
-        counts.removeIf(coordinate -> {
-            final int count = counts.count(coordinate);
-            return count < 12;
-        });
     }
 
     private static List<Scanner> parseScanners(final List<String> data) {
