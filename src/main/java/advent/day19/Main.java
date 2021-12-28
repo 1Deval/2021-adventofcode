@@ -6,25 +6,58 @@ import com.google.common.collect.Multiset;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.PriorityQueue;
+import java.util.Set;
 
 public class Main {
 
 
     public static void main(final String... args) throws IOException {
-        final List<String> data = Util.getData("day19/sample.txt");
+        final List<String> data = Util.getData("day19/input.txt");
 
         final List<Scanner> scanners = parseScanners(data);
 
 
         final Scanner base = scanners.get(0);
 
+        System.out.println(scanners.get(0).coordinates.size());
+        visit(scanners);
+        Map<Integer, Integer> visitMap = visit(scanners);
+        for (int i = 1; i < scanners.size(); i++) {
+            if (visitMap.containsKey(i)) {
+                final int to = visitMap.get(i);
+                final Scanner beacons = scanners.get(to).findBeacons(scanners.get(i));
+                if (beacons != null) {
+                    scanners.set(to, beacons);
+                }
+            }
+        }
+        visit(scanners);
+        visitMap = visit(scanners);
+        for (int i = 1; i < scanners.size(); i++) {
+            if (visitMap.containsKey(i)) {
+                final int to = visitMap.get(i);
+                final Scanner beacons = scanners.get(to).findBeacons(scanners.get(i));
+                if (beacons != null) {
+                    scanners.set(to, beacons);
+                }
+            }
+        }
+
+
+        System.out.println(scanners.get(0).coordinates.size());
+
+
 //        System.out.println(base.findBeacons(scanners.get(1).findBeacons(scanners.get(4))).findBeacons(scanners.get(2)).findBeacons(scanners.get(3)).coordinates.size());
 
 //        System.out.println(base.coordinates.size());
 
-        System.out.println(findBeacons(base, Collections.singletonList(0), scanners).coordinates.size());
+//        System.out.println(findBeacons(base, Collections.singletonList(0), scanners).coordinates.size());
 
 
 //        System.out.println(scanners.get(1).findBeacons(scanners.get(4)).coordinates.size());
@@ -81,6 +114,42 @@ public class Main {
 //            System.out.println(str);
 //        }
 
+    }
+
+    private static Map<Integer, Integer> visit(final List<Scanner> scanners) {
+        final HashSet<Integer> visited = new HashSet<>();
+        final PriorityQueue<Integer> toVisit = new PriorityQueue<>();
+        toVisit.add(0);
+        final Map<Integer, Integer> visitMap = new HashMap<>();
+        while (!toVisit.isEmpty()) {
+            final Set<Integer> surround = fill(toVisit.poll(), visited, scanners, visitMap);
+            surround.removeAll(visited);
+            toVisit.forEach(surround::remove);
+            toVisit.addAll(surround);
+        }
+        System.out.println(visitMap);
+        System.out.println(visitMap.size());
+        return visitMap;
+    }
+
+    private static Set<Integer> fill(final Integer poll, final HashSet<Integer> visited, final List<Scanner> scanners, final Map<Integer, Integer> visitMap) {
+        if (visited.contains(poll)) {
+            return Collections.emptySet();
+        }
+        visited.add(poll);
+        final Set<Integer> surround = new HashSet<>();
+        for (int i = 0; i < scanners.size(); i++) {
+            if (i != poll && !visitMap.containsKey(i)) {
+                final Scanner beacons = scanners.get(poll).findBeacons(scanners.get(i));
+                if (beacons != null) {
+                    visitMap.put(i, poll);
+                    surround.add(i);
+                    scanners.set(poll, beacons);
+                }
+            }
+        }
+
+        return surround;
     }
 
     private static Scanner findBeacons(final Scanner base, final List<Integer> visited, final List<Scanner> scanners) {
